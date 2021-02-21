@@ -3,25 +3,25 @@
 Configure your SwiftRex Store, Middleware and Reducers using new function builders
 
 ```swift
-extension Reducer where ActionType == String, StateType == String {
+extension Reducer where ActionType == AppAction, StateType == AppState {
     static var reducer1: Reducer {
-        Reducer { a, s in s }
+        Reducer.reduce { a, s in }
     }
 
     static var reducer2: Reducer {
-        Reducer { a, s in s }
+        Reducer.reduce { a, s in }
     }
 
     static var reducer3: Reducer {
-        Reducer { a, s in s }
+        Reducer.reduce { a, s in }
     }
 
     static var reducer4: Reducer {
-        Reducer { a, s in s }
+        Reducer.reduce { a, s in }
     }
 
     static var reducer5: Reducer {
-        Reducer { a, s in s }
+        Reducer.reduce { a, s in }
     }
 }
 
@@ -38,30 +38,30 @@ let store = ReduxStoreBase(initial: "", emitsValue: .whenDifferent) {
         Reducer.reducer5
     }
 
-    ComposedMiddleware<String, String, String> {
+    ComposedMiddleware {
         SomeMiddleware1()
 
-        AnyMiddleware(inputAction: { a in .some(a) },
-                      outputAction: { $0 },
-                      state: { $0 }) {
-            SomeMiddleware1()
+        LiftMiddleware(inputAction: AppAction.certainActionSubset) {
+            SomeMiddleware2()
         }
 
-        SomeMiddleware1()
+        LiftMiddleware(outputAction: \AppAction.certainActionSubset) {
+            SomeMiddleware3()
+        }
 
-        SomeMiddleware1()
+        SomeMiddleware4()
 
-        SomeMiddleware1()
+        SomeMiddleware5()
 
-        SomeMiddleware1()
+        AnyMiddleware {
+            SomeMiddleware6()
+        }
 
-        SomeMiddleware1()
-
-        SomeMiddleware1()
-
-        SomeMiddleware1()
-
-        SomeMiddleware1()
+        LiftMiddleware(inputAction: AppAction.certainActionSubset,
+                       outputAction: \AppAction.certainActionSubset,
+                       state: \AppState.mySubState) {
+            SomeMiddleware7()
+        }
     }
 }
 ```

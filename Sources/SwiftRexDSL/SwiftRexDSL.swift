@@ -1,7 +1,7 @@
 import CombineRex
 import SwiftRex
 
-@_functionBuilder public struct StoreBuilder {
+@resultBuilder public struct StoreBuilder {
     public static func buildBlock<M: Middleware, Action, State>(_ reducer: Reducer<M.InputActionType, M.StateType>, _ middleware: M)
         -> (Reducer<Action, State>, M) where M.InputActionType == M.OutputActionType, M.InputActionType == Action, M.StateType == State {
         (reducer, middleware)
@@ -25,7 +25,7 @@ extension ReduxStoreBase {
 }
 
 // MARK: - DSL (Reducer)
-@_functionBuilder public struct ReducerBuilder {
+@resultBuilder public struct ReducerBuilder {
     public static func buildBlock<Action, State>(_ rs: Reducer<Action, State>...) -> Reducer<Action, State> {
         rs.reduce(.identity, <>)
     }
@@ -39,7 +39,7 @@ extension Reducer {
 
 // MARK: - DSL (Middleware)
 
-@_functionBuilder public struct MiddlewareBuilder {
+@resultBuilder public struct MiddlewareBuilder {
     public static func buildBlock<M0: Middleware>(_ m0: M0) -> M0 {
         m0
     }
@@ -250,114 +250,110 @@ extension ComposedMiddleware {
     }
 }
 
-extension AnyMiddleware {
+extension LiftMiddleware {
     // All different
-    public init<M: Middleware>(
-        inputAction: @escaping (InputActionType) -> M.InputActionType?,
-        outputAction: @escaping (M.OutputActionType) -> OutputActionType,
-        state: @escaping (StateType) -> M.StateType,
-        @MiddlewareBuilder content: () -> M
+    public init(
+        inputAction: @escaping (GlobalInputActionType) -> PartMiddleware.InputActionType?,
+        outputAction: @escaping (PartMiddleware.OutputActionType) -> GlobalOutputActionType,
+        state: @escaping (GlobalStateType) -> PartMiddleware.StateType,
+        @MiddlewareBuilder content: () -> PartMiddleware
     ) {
         self = content()
             .lift(
-                inputActionMap: inputAction,
-                outputActionMap: outputAction,
-                stateMap: state
+                inputAction: inputAction,
+                outputAction: outputAction,
+                state: state
             )
-            .eraseToAnyMiddleware()
     }
 
     // Same input action
-    public init<M: Middleware>(
-        outputAction: @escaping (M.OutputActionType) -> OutputActionType,
-        state: @escaping (StateType) -> M.StateType,
-        @MiddlewareBuilder content: () -> M
-    ) where InputActionType == M.InputActionType {
+    public init(
+        outputAction: @escaping (PartMiddleware.OutputActionType) -> GlobalOutputActionType,
+        state: @escaping (GlobalStateType) -> PartMiddleware.StateType,
+        @MiddlewareBuilder content: () -> PartMiddleware
+    ) where InputActionType == PartMiddleware.InputActionType {
         self = content()
             .lift(
-                inputActionMap: { .some($0) },
-                outputActionMap: outputAction,
-                stateMap: state
+                inputAction: { $0 },
+                outputAction: outputAction,
+                state: state
             )
-            .eraseToAnyMiddleware()
     }
 
     // Same output action
-    public init<M: Middleware>(
-        inputAction: @escaping (InputActionType) -> M.InputActionType?,
-        state: @escaping (StateType) -> M.StateType,
-        @MiddlewareBuilder content: () -> M
-    ) where M.OutputActionType == OutputActionType {
+    public init(
+        inputAction: @escaping (GlobalInputActionType) -> PartMiddleware.InputActionType?,
+        state: @escaping (GlobalStateType) -> PartMiddleware.StateType,
+        @MiddlewareBuilder content: () -> PartMiddleware
+    ) where OutputActionType == PartMiddleware.OutputActionType {
         self = content()
             .lift(
-                inputActionMap: inputAction,
-                outputActionMap: { $0 },
-                stateMap: state
+                inputAction: inputAction,
+                outputAction: { $0 },
+                state: state
             )
-            .eraseToAnyMiddleware()
     }
 
     // Same state
-    public init<M: Middleware>(
-        inputAction: @escaping (InputActionType) -> M.InputActionType?,
-        outputAction: @escaping (M.OutputActionType) -> OutputActionType,
-        @MiddlewareBuilder content: () -> M
-    ) where StateType == M.StateType {
+    public init(
+        inputAction: @escaping (GlobalInputActionType) -> PartMiddleware.InputActionType?,
+        outputAction: @escaping (PartMiddleware.OutputActionType) -> GlobalOutputActionType,
+        @MiddlewareBuilder content: () -> PartMiddleware
+    ) where StateType == PartMiddleware.StateType {
         self = content()
             .lift(
-                inputActionMap: inputAction,
-                outputActionMap: outputAction,
-                stateMap: { $0 }
+                inputAction: inputAction,
+                outputAction: outputAction,
+                state: { $0 }
             )
-            .eraseToAnyMiddleware()
     }
 
     // Same input action and same output action
-    public init<M: Middleware>(
-        state: @escaping (StateType) -> M.StateType,
-        @MiddlewareBuilder content: () -> M
-    ) where InputActionType == M.InputActionType, M.OutputActionType == OutputActionType {
+    public init(
+        state: @escaping (GlobalStateType) -> PartMiddleware.StateType,
+        @MiddlewareBuilder content: () -> PartMiddleware
+    ) where InputActionType == PartMiddleware.InputActionType, PartMiddleware.OutputActionType == OutputActionType {
         self = content()
             .lift(
-                inputActionMap: { .some($0) },
-                outputActionMap: { $0 },
-                stateMap: state
+                inputAction: { $0 },
+                outputAction: { $0 },
+                state: state
             )
-            .eraseToAnyMiddleware()
     }
 
     // Same input action and same state
-    public init<M: Middleware>(
-        outputAction: @escaping (M.OutputActionType) -> OutputActionType,
-        @MiddlewareBuilder content: () -> M
-    ) where InputActionType == M.InputActionType, StateType == M.StateType {
+    public init(
+        outputAction: @escaping (PartMiddleware.OutputActionType) -> GlobalOutputActionType,
+        @MiddlewareBuilder content: () -> PartMiddleware
+    ) where InputActionType == PartMiddleware.InputActionType, StateType == PartMiddleware.StateType {
         self = content()
             .lift(
-                inputActionMap: { .some($0) },
-                outputActionMap: outputAction,
-                stateMap: { $0 }
+                inputAction: { $0 },
+                outputAction: outputAction,
+                state: { $0 }
             )
-            .eraseToAnyMiddleware()
     }
 
     // Same output action and same state
-    public init<M: Middleware>(
-        inputAction: @escaping (InputActionType) -> M.InputActionType?,
-        @MiddlewareBuilder content: () -> M
-    ) where M.OutputActionType == OutputActionType, StateType == M.StateType {
+    public init(
+        inputAction: @escaping (GlobalInputActionType) -> PartMiddleware.InputActionType?,
+        @MiddlewareBuilder content: () -> PartMiddleware
+    ) where PartMiddleware.OutputActionType == OutputActionType, StateType == PartMiddleware.StateType {
         self = content()
             .lift(
-                inputActionMap: inputAction,
-                outputActionMap: { $0 },
-                stateMap: { $0 }
+                inputAction: inputAction,
+                outputAction: { $0 },
+                state: { $0 }
             )
-            .eraseToAnyMiddleware()
     }
+}
 
+extension AnyMiddleware {
     // Nothing changes
     public init<M: Middleware>(
         @MiddlewareBuilder content: () -> M
     ) where M.InputActionType == InputActionType, M.OutputActionType == OutputActionType, M.StateType == StateType {
-        self = content().eraseToAnyMiddleware()
+        self = content()
+            .eraseToAnyMiddleware()
     }
 }

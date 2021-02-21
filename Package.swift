@@ -12,7 +12,7 @@ let package = Package(
         .library(name: "SwiftRexDSL", targets: ["SwiftRexDSL"])
     ],
     dependencies: [
-        .package(url: "https://github.com/SwiftRex/SwiftRex.git", from: "0.7.0")
+        .package(url: "https://github.com/SwiftRex/SwiftRex.git", from: "0.8.2")
     ],
     targets: [
         .target(name: "SwiftRexDSL", dependencies: ["CombineRex"]),

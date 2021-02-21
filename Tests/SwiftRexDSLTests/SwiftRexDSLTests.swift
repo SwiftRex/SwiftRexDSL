@@ -25,23 +25,23 @@ class SomeMiddleware1: Middleware {
 
 extension Reducer where ActionType == String, StateType == String {
     static var reducer1: Reducer {
-        Reducer { a, s in s }
+        Reducer.reduce { _, _ in }
     }
 
     static var reducer2: Reducer {
-        Reducer { a, s in s }
+        Reducer.reduce { _, _ in }
     }
 
     static var reducer3: Reducer {
-        Reducer { a, s in s }
+        Reducer.reduce { _, _ in }
     }
 
     static var reducer4: Reducer {
-        Reducer { a, s in s }
+        Reducer.reduce { _, _ in }
     }
 
     static var reducer5: Reducer {
-        Reducer { a, s in s }
+        Reducer.reduce { _, _ in }
     }
 }
 
@@ -58,12 +58,10 @@ let store = ReduxStoreBase(initial: "", emitsValue: .whenDifferent) {
         Reducer.reducer5
     }
 
-    ComposedMiddleware<String, String, String> {
+    ComposedMiddleware {
         SomeMiddleware1()
 
-        AnyMiddleware(inputAction: { a in .some(a) },
-                      outputAction: { $0 },
-                      state: { $0 }) {
+        LiftMiddleware(inputAction: Optional.some) {
             SomeMiddleware1()
         }
 
@@ -71,7 +69,9 @@ let store = ReduxStoreBase(initial: "", emitsValue: .whenDifferent) {
 
         SomeMiddleware1()
 
-        SomeMiddleware1()
+        AnyMiddleware {
+            SomeMiddleware1()
+        }
 
         SomeMiddleware1()
 
