@@ -1,4 +1,4 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.4
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -12,10 +12,10 @@ let package = Package(
         .library(name: "SwiftRexDSL", targets: ["SwiftRexDSL"])
     ],
     dependencies: [
-        .package(url: "https://github.com/SwiftRex/SwiftRex.git", from: "0.8.2")
+        .package(url: "https://github.com/SwiftRex/SwiftRex.git", .upToNextMajor(from: "0.8.8"))
     ],
     targets: [
-        .target(name: "SwiftRexDSL", dependencies: ["CombineRex"]),
+        .target(name: "SwiftRexDSL", dependencies: [.product(name: "CombineRex", package: "SwiftRex")]),
         .testTarget(name: "SwiftRexDSLTests", dependencies: ["SwiftRexDSL"])
     ]
 )

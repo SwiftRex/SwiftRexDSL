@@ -11,15 +11,13 @@ final class SwiftRexDSLTests: XCTestCase {
     ]
 }
 
-class SomeMiddleware1: Middleware {
+class SomeMiddleware1: MiddlewareProtocol {
     typealias InputActionType = String
     typealias OutputActionType = String
     typealias StateType = String
 
-    func receiveContext(getState: @escaping GetState<String>, output: AnyActionHandler<String>) {
-    }
-
-    func handle(action: String, from dispatcher: ActionSource, afterReducer: inout AfterReducer) {
+    func handle(action: String, from dispatcher: ActionSource, state: @escaping GetState<String>) -> IO<String> {
+        .pure()
     }
 }
 
