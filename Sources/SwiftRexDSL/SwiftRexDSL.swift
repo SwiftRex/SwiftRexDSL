@@ -2,14 +2,14 @@ import CombineRex
 import SwiftRex
 
 @resultBuilder public struct StoreBuilder {
-    public static func buildBlock<M: Middleware, Action, State>(_ reducer: Reducer<M.InputActionType, M.StateType>, _ middleware: M)
+    public static func buildBlock<M: MiddlewareProtocol, Action, State>(_ reducer: Reducer<M.InputActionType, M.StateType>, _ middleware: M)
         -> (Reducer<Action, State>, M) where M.InputActionType == M.OutputActionType, M.InputActionType == Action, M.StateType == State {
         (reducer, middleware)
     }
 }
 
 extension ReduxStoreBase {
-    public convenience init<M: Middleware>(
+    public convenience init<M: MiddlewareProtocol>(
         initial: StateType,
         emitsValue: ShouldEmitValue<StateType>,
         @StoreBuilder content: () -> (Reducer<ActionType, StateType>, M)
@@ -40,7 +40,7 @@ extension Reducer {
 // MARK: - DSL (Middleware)
 
 @resultBuilder public struct MiddlewareBuilder {
-    public static func buildBlock<M0: Middleware>(_ m0: M0) -> M0 {
+    public static func buildBlock<M0: MiddlewareProtocol>(_ m0: M0) -> M0 {
         m0
     }
 
@@ -53,20 +53,20 @@ extension Reducer {
         return composed
     }
 
-    public static func buildBlock<M0: Middleware, M1: Middleware>(_ m0: M0, _ m1: M1)
+    public static func buildBlock<M0: MiddlewareProtocol, M1: MiddlewareProtocol>(_ m0: M0, _ m1: M1)
     -> ComposedMiddleware<M0.InputActionType, M0.OutputActionType, M0.StateType>
     where M0.InputActionType == M1.InputActionType, M0.OutputActionType == M1.OutputActionType, M0.StateType == M1.StateType {
         m0 <> m1
     }
 
-    public static func buildBlock<M0: Middleware, M1: Middleware, M2: Middleware>(_ m0: M0, _ m1: M1, _ m2: M2)
+    public static func buildBlock<M0: MiddlewareProtocol, M1: MiddlewareProtocol, M2: MiddlewareProtocol>(_ m0: M0, _ m1: M1, _ m2: M2)
     -> ComposedMiddleware<M0.InputActionType, M0.OutputActionType, M0.StateType>
     where M0.InputActionType == M1.InputActionType, M0.OutputActionType == M1.OutputActionType, M0.StateType == M1.StateType,
         M0.InputActionType == M2.InputActionType, M0.OutputActionType == M2.OutputActionType, M0.StateType == M2.StateType {
         m0 <> m1 <> m2
     }
 
-    public static func buildBlock<M0: Middleware, M1: Middleware, M2: Middleware, M3: Middleware>(_ m0: M0, _ m1: M1, _ m2: M2, _ m3: M3)
+    public static func buildBlock<M0: MiddlewareProtocol, M1: MiddlewareProtocol, M2: MiddlewareProtocol, M3: MiddlewareProtocol>(_ m0: M0, _ m1: M1, _ m2: M2, _ m3: M3)
     -> ComposedMiddleware<M0.InputActionType, M0.OutputActionType, M0.StateType>
     where M0.InputActionType == M1.InputActionType, M0.OutputActionType == M1.OutputActionType, M0.StateType == M1.StateType,
         M0.InputActionType == M2.InputActionType, M0.OutputActionType == M2.OutputActionType, M0.StateType == M2.StateType,
@@ -75,11 +75,11 @@ extension Reducer {
     }
 
     public static func buildBlock<
-        M0: Middleware,
-        M1: Middleware,
-        M2: Middleware,
-        M3: Middleware,
-        M4: Middleware
+        M0: MiddlewareProtocol,
+        M1: MiddlewareProtocol,
+        M2: MiddlewareProtocol,
+        M3: MiddlewareProtocol,
+        M4: MiddlewareProtocol
     >(
         _ m0: M0,
         _ m1: M1,
@@ -95,12 +95,12 @@ extension Reducer {
     }
 
     public static func buildBlock<
-        M0: Middleware,
-        M1: Middleware,
-        M2: Middleware,
-        M3: Middleware,
-        M4: Middleware,
-        M5: Middleware
+        M0: MiddlewareProtocol,
+        M1: MiddlewareProtocol,
+        M2: MiddlewareProtocol,
+        M3: MiddlewareProtocol,
+        M4: MiddlewareProtocol,
+        M5: MiddlewareProtocol
     >(
         _ m0: M0,
         _ m1: M1,
@@ -118,13 +118,13 @@ extension Reducer {
     }
 
     public static func buildBlock<
-        M0: Middleware,
-        M1: Middleware,
-        M2: Middleware,
-        M3: Middleware,
-        M4: Middleware,
-        M5: Middleware,
-        M6: Middleware
+        M0: MiddlewareProtocol,
+        M1: MiddlewareProtocol,
+        M2: MiddlewareProtocol,
+        M3: MiddlewareProtocol,
+        M4: MiddlewareProtocol,
+        M5: MiddlewareProtocol,
+        M6: MiddlewareProtocol
     >(
         _ m0: M0,
         _ m1: M1,
@@ -145,14 +145,14 @@ extension Reducer {
     }
 
     public static func buildBlock<
-        M0: Middleware,
-        M1: Middleware,
-        M2: Middleware,
-        M3: Middleware,
-        M4: Middleware,
-        M5: Middleware,
-        M6: Middleware,
-        M7: Middleware
+        M0: MiddlewareProtocol,
+        M1: MiddlewareProtocol,
+        M2: MiddlewareProtocol,
+        M3: MiddlewareProtocol,
+        M4: MiddlewareProtocol,
+        M5: MiddlewareProtocol,
+        M6: MiddlewareProtocol,
+        M7: MiddlewareProtocol
     >(
         _ m0: M0,
         _ m1: M1,
@@ -175,15 +175,15 @@ extension Reducer {
     }
 
     public static func buildBlock<
-        M0: Middleware,
-        M1: Middleware,
-        M2: Middleware,
-        M3: Middleware,
-        M4: Middleware,
-        M5: Middleware,
-        M6: Middleware,
-        M7: Middleware,
-        M8: Middleware
+        M0: MiddlewareProtocol,
+        M1: MiddlewareProtocol,
+        M2: MiddlewareProtocol,
+        M3: MiddlewareProtocol,
+        M4: MiddlewareProtocol,
+        M5: MiddlewareProtocol,
+        M6: MiddlewareProtocol,
+        M7: MiddlewareProtocol,
+        M8: MiddlewareProtocol
     >(
         _ m0: M0,
         _ m1: M1,
@@ -208,16 +208,16 @@ extension Reducer {
     }
 
     public static func buildBlock<
-        M0: Middleware,
-        M1: Middleware,
-        M2: Middleware,
-        M3: Middleware,
-        M4: Middleware,
-        M5: Middleware,
-        M6: Middleware,
-        M7: Middleware,
-        M8: Middleware,
-        M9: Middleware
+        M0: MiddlewareProtocol,
+        M1: MiddlewareProtocol,
+        M2: MiddlewareProtocol,
+        M3: MiddlewareProtocol,
+        M4: MiddlewareProtocol,
+        M5: MiddlewareProtocol,
+        M6: MiddlewareProtocol,
+        M7: MiddlewareProtocol,
+        M8: MiddlewareProtocol,
+        M9: MiddlewareProtocol
     >(
         _ m0: M0,
         _ m1: M1,
@@ -350,7 +350,7 @@ extension LiftMiddleware {
 
 extension AnyMiddleware {
     // Nothing changes
-    public init<M: Middleware>(
+    public init<M: MiddlewareProtocol>(
         @MiddlewareBuilder content: () -> M
     ) where M.InputActionType == InputActionType, M.OutputActionType == OutputActionType, M.StateType == StateType {
         self = content()
